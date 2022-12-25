@@ -1,0 +1,22 @@
+tasks:
+  - init: echo "init"
+    command: echo "started"
+  
+image:
+  file: .gitpod.dockerfile
+
+ports:
+  - port: 3000
+    onOpen: open-preview
+    name: devlake-website
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: true
+    addComment: true
+    addBadge: true
+
