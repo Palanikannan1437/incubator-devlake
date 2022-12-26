@@ -29,11 +29,11 @@ tasks:
   - name: start frontend
     init: 
       cd config-ui
-      npm install
+      nvm use 14.21.0 && npm install
       cd ../
     command: |
       cd config-ui
-      npm start
+      nvm use 14.21.0 && npm start
 
 ports:
   - port: 8080
