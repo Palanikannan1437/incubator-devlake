@@ -15,11 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package core
+package migrationscripts
 
-import "github.com/apache/incubator-devlake/plugins/core/dal"
+import (
+	"github.com/apache/incubator-devlake/errors"
+	"github.com/apache/incubator-devlake/plugins/core"
+)
 
-type PluginModel interface {
-	// This method returns all models of the current plugin
-	GetTablesInfo() []dal.Tabler
+var _ core.MigrationScript = (*renameProjectMetrics)(nil)
+
+type renameProjectMetrics struct{}
+
+type ProjectMetricSetting struct {
+}
+
+func (ProjectMetricSetting) TableName() string {
+	return "project_metric_settings"
+}
+
+func (script *renameProjectMetrics) Up(basicRes core.BasicRes) errors.Error {
+	db := basicRes.GetDal()
+	// To create multiple tables with migrationhelper
+	return db.RenameTable(ProjectMetric{}.TableName(), ProjectMetricSetting{}.TableName())
+}
+
+func (*renameProjectMetrics) Version() uint64 {
+	return 20222123191424
+}
+
+func (*renameProjectMetrics) Name() string {
+	return "rename project metrics"
 }
