@@ -1,4 +1,4 @@
-FROM gitpod/workspace-base:2022-12-15-12-38-23
+FROM gitpod/workspace-full:2022-12-15-12-38-23
 
 # installing a specific go version
 ENV GO_VERSION=1.19
