@@ -1,14 +1,53 @@
 tasks:
-  - init: echo "init"
-    command: echo "started"
-  
-# image:
-#   file: .gitpod.dockerfile
+  - name: Initialize libgit 2
+    init: |
+      git clone -b v1.3.0 https://github.com/libgit2/libgit2.git && cd libgit2
+      mkdir build && cd build && sudo cmake ..
+      sudo make && sudo make install
+      cd ../../
+    command: |
+      gp sync-done init_libgit
+      echo "Initialized libgit2 v1.3.0 🚀"
+
+  - name: Install mysql and grafana
+    init: docker pull mysql grafana
+    command: |
+      gp sync-done init_docker_containers
+      echo "MySQL and Grafana downloaded🚀"
+
+  - name: start backend
+    env:
+      PKG_CONFIG_PATH: $PKG_CONFIG_PATH:/usr/local/lib:/usr/local/lib/pkgconfig
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/usr/local/lib
+      DB_URL: mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4&parseTime=True
+    init: go get
+    command: |
+      gp sync-await init_libgit && gp sync-await init_docker_containers && cp .env.example .env
+      docker-compose up -d mysql grafana
+      make dev
+
+  - name: start frontend
+    init: 
+      cd config-ui
+      npm install
+      cd ../
+    command: |
+      cd config-ui
+      npm start
 
 ports:
-  - port: 3000
+  - port: 8080
+    onOpen: ignore
+    name: devlake-api
+    visibility: public
+  - port: 4000
     onOpen: open-preview
-    name: devlake-website
+    name: devlake-ui
+    visibility: public
+  - port: 3306
+    onOpen: ignore
+  - port: 3002
+    onOpen: ignore
 
 github:
   prebuilds:
@@ -20,3 +59,9 @@ github:
     addComment: true
     addBadge: true
 
+image:
+  file: .gitpod.dockerfile
+
+vscode:
+  extensions:
+    - golang.go
