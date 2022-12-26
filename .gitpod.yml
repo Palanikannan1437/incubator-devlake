@@ -2,8 +2,8 @@ tasks:
   - init: echo "init"
     command: echo "started"
   
-image:
-  file: .gitpod.dockerfile
+# image:
+#   file: .gitpod.dockerfile
 
 ports:
   - port: 3000
