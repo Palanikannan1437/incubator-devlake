@@ -12,7 +12,7 @@ tasks:
   - name: Install mysql and grafana
     init: |
       docker pull mysql 
-      docker pull grafana
+      docker pull grafana/grafana
     command: |
       gp sync-done init_docker_containers
       echo "MySQL and Grafana downloaded🚀"
