@@ -19,8 +19,8 @@ tasks:
 
   - name: start backend
     env:
-      PKG_CONFIG_PATH: $PKG_CONFIG_PATH:/usr/local/lib:/usr/local/lib/pkgconfig
-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/usr/local/lib
+      PKG_CONFIG_PATH: "${PKG_CONFIG_PATH}:/usr/local/lib:/usr/local/lib/pkgconfig"
+      LD_LIBRARY_PATH: "${LD_LIBRARY_PATH}:/usr/local/lib"
       DB_URL: mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4&parseTime=True
     init: go get
     command: |
