@@ -10,7 +10,9 @@ tasks:
       echo "Initialized libgit2 v1.3.0 🚀"
 
   - name: Install mysql and grafana
-    init: docker pull mysql grafana
+    init: |
+      docker pull mysql 
+      docker pull grafana
     command: |
       gp sync-done init_docker_containers
       echo "MySQL and Grafana downloaded🚀"
@@ -27,7 +29,7 @@ tasks:
       make dev
 
   - name: start frontend
-    init: 
+    init: |
       cd config-ui
       nvm use 14.21.0 && npm install
       cd ../
