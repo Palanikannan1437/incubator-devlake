@@ -23,10 +23,10 @@ import type { ConnectionItemType } from '@/store'
 import { useConnection, ConnectionStatusEnum } from '@/store'
 import { operator } from '@/utils'
 
+import { ModeEnum, FromEnum } from '../types'
 import { validRawPlan } from '../utils'
 
 import type { BPContextType } from './types'
-import { FromEnum, ModeEnum } from './types'
 import * as API from './api'
 
 export const BPContext = React.createContext<BPContextType>({
@@ -191,7 +191,7 @@ export const BPContextProvider = ({ from, projectName, children }: Props) => {
     })
 
     if (success) {
-      handleSaveAfter(res.id)
+      handleSaveAfter(res.blueprintId)
     }
   }
 

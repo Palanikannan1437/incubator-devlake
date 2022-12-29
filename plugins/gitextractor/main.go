@@ -57,6 +57,11 @@ func main() {
 	if *id == "" {
 		panic("id is missing")
 	}
+	db, err := runner.NewGormDb(cfg, log)
+	if err != nil {
+		panic(err)
+	}
+	basicRes := rootImpl.NewDefaultBasicRes(cfg, log, dalgorm.NewDalgorm(db))
 	if *output != "" {
 		storage, err = store.NewCsvStore(*output)
 		if err != nil {
@@ -64,15 +69,11 @@ func main() {
 		}
 	} else if *dbUrl != "" {
 		cfg.Set("DB_URL", *dbUrl)
-	} else {
-		panic("either specify `-output` or `-db` argument as destination")
 	}
-	db, err := runner.NewGormDb(cfg, log)
-	if err != nil {
-		panic(err)
+	// If we didn't specify output or dburl, we will use db by default
+	if storage == nil {
+		storage = store.NewDatabase(basicRes, *url)
 	}
-	basicRes := rootImpl.NewDefaultBasicRes(cfg, log, dalgorm.NewDalgorm(db))
-	storage = store.NewDatabase(basicRes, *url)
 	defer storage.Close()
 	ctx := context.Background()
 	subTaskCtx := helper.NewStandaloneSubTaskContext(

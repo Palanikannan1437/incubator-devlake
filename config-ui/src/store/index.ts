@@ -16,5 +16,6 @@
  *
  */
 
-export * from './connections'
 export * from './version'
+export * from './connections'
+export * from './transformations'

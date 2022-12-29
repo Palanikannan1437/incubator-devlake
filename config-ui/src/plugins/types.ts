@@ -17,14 +17,59 @@
  */
 
 export enum Plugins {
+  AE = 'ae',
+  Azure = 'azure',
+  BitBucket = 'bitbucket',
+  DBT = 'dbt',
+  DORA = 'dora',
+  FeiShu = 'feishu',
+  Gitee = 'gitee',
+  GitExtractor = 'gitextractor',
   GitHub = 'github',
-  JIRA = 'jira',
+  GitHubGraphql = 'github_graphql',
   GitLab = 'gitlab',
   Jenkins = 'jenkins',
-  Webhook = 'webhook'
+  JIRA = 'jira',
+  RefDiff = 'refdiff',
+  StarRocks = 'starrocks',
+  TAPD = 'tapd',
+  Webhook = 'webhook',
+  ZenTao = 'zentao'
 }
 
 export enum PluginType {
   Connection = 'connection',
-  Incoming_Connection = 'incoming_connection'
+  Incoming_Connection = 'incoming_connection',
+  Pipeline = 'pipeline'
 }
+
+export type PluginConfigConnectionType = {
+  plugin: Plugins
+  name: string
+  type: PluginType.Connection
+  icon: string
+  connection: {
+    initialValues?: Record<string, any>
+    fields: Array<{
+      key: string
+      type: 'text' | 'password' | 'numeric' | 'switch' | 'github-token'
+      label: string
+      required?: boolean
+      placeholder?: string
+      tooltip?: string
+    }>
+  }
+  entities: string[]
+  transformation: any
+}
+
+export type PluginConfigAnotherType = {
+  plugin: Plugins
+  name: string
+  type: PluginType.Incoming_Connection | PluginType.Pipeline
+  icon: string
+}
+
+export type PluginConfigType =
+  | PluginConfigConnectionType
+  | PluginConfigAnotherType

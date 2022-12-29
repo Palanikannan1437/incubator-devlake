@@ -17,15 +17,15 @@
  */
 
 import React, { useMemo } from 'react'
+import { pick } from 'lodash'
 import { InputGroup, Icon } from '@blueprintjs/core'
 
 import { useConnection, ConnectionStatusEnum } from '@/store'
 import { Card, Divider, MultiSelector, Loading } from '@/components'
 
-import { ModeEnum } from '../../types'
+import { ModeEnum, FromEnum } from '../../types'
 import { AdvancedEditor } from '../../components'
 import { useCreateBP } from '../bp-context'
-import { FromEnum } from '../types'
 
 import * as S from './styled'
 
@@ -41,10 +41,12 @@ export const StepOne = ({ from }: Props) => {
     name,
     rawPlan,
     uniqueList,
+    scopeMap,
     onChangeMode,
     onChangeName,
     onChangeRawPlan,
-    onChangeUniqueList
+    onChangeUniqueList,
+    onChangeScopeMap
   } = useCreateBP()
 
   const fromProject = useMemo(() => from === FromEnum.project, [from])
@@ -82,8 +84,13 @@ export const StepOne = ({ from }: Props) => {
                 uniqueList.includes(cs.unique)
               )}
               onChangeItems={(selectedItems) => {
-                onTest(selectedItems[selectedItems.length - 1])
-                onChangeUniqueList(selectedItems.map((sc) => sc.unique))
+                const lastItem = selectedItems[selectedItems.length - 1]
+                if (lastItem) {
+                  onTest(lastItem)
+                }
+                const uniqueList = selectedItems.map((sc) => sc.unique)
+                onChangeUniqueList(uniqueList)
+                onChangeScopeMap(pick(scopeMap, uniqueList))
               }}
             />
             <S.ConnectionList>

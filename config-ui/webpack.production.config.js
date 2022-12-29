@@ -42,7 +42,7 @@ module.exports = (env = {}) => {
       rules: [
         {
           test: /\.(tsx?|jsx?)$/,
-          exclude: [/node_modules/, /packages/, /cypress/, /^config$/],
+          exclude: [/node_modules/, /packages/, /^config$/],
           use: {
             loader: 'babel-loader'
           }
@@ -55,43 +55,6 @@ module.exports = (env = {}) => {
             MiniCssExtractPlugin.loader,
             'css-loader'
           ]
-        },
-        {
-          test: /\.scss$/,
-          use: [
-            {
-              loader: MiniCssExtractPlugin.loader
-            },
-            {
-              loader: require.resolve('css-loader'),
-              options: {
-                importLoaders: 1
-              }
-            },
-            {
-              loader: require.resolve('postcss-loader'),
-              options: {
-                postcssOptions: {
-                  plugins: [
-                    require('autoprefixer'),
-                    require('cssnano')({ preset: 'default' })
-                  ]
-                }
-              }
-            },
-            {
-              loader: 'resolve-url-loader'
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                implementation: require('node-sass'),
-                sourceMap: true,
-                additionalData: '@import "@/styles/theme.scss";'
-              }
-            }
-          ]
-          // sideEffects: true
         },
         {
           test: /\.html$/,
@@ -135,7 +98,7 @@ module.exports = (env = {}) => {
         '@config': path.resolve(__dirname, './config/')
       },
       // modules: ['node_modules'],
-      extensions: ['*', '.js', '.jsx', '.scss', '.ts', '.tsx']
+      extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
     },
     output: {
       path: path.resolve(__dirname, './dist'),
@@ -163,7 +126,7 @@ module.exports = (env = {}) => {
       new webpack.HotModuleReplacementPlugin(),
       new MiniCssExtractPlugin({ filename: '[name].[hash].css' }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, './src/index-production.html'),
+        template: path.resolve(__dirname, './src/index.html'),
         filename: 'index.html',
         favicon: path.resolve(__dirname, './src/images/favicon.ico')
       }),
@@ -173,7 +136,7 @@ module.exports = (env = {}) => {
       }),
       new ESLintPlugin({
         context: path.resolve(__dirname, './'),
-        exclude: ['dist', 'packages', 'cypress', 'config', 'node_modules']
+        exclude: ['dist', 'packages', 'config', 'node_modules']
       }),
       ...optionalPlugins
     ]

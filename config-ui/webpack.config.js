@@ -41,28 +41,11 @@ module.exports = (env = {}) => {
         {
           test: /\.(tsx?|jsx?)$/,
           use: ['babel-loader'],
-          exclude: [/node_modules/, /packages/, /cypress/, /^config$/]
+          exclude: [/node_modules/, /packages/, /^config$/]
         },
         {
           test: /\.css$/,
           use: ['style-loader', 'css-loader']
-        },
-        {
-          test: /\.scss$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            'resolve-url-loader',
-            // 'sass-loader'
-            {
-              loader: 'sass-loader',
-              options: {
-                implementation: require('node-sass'),
-                sourceMap: true,
-                additionalData: '@import "@/styles/theme.scss";'
-              }
-            }
-          ]
         },
         {
           test: /\.html$/,
@@ -128,7 +111,7 @@ module.exports = (env = {}) => {
         // Do NOT auto-fix w/ eslint on webpack startup!
         fix: false,
         context: path.resolve(__dirname, './'),
-        exclude: ['dist', 'packages', 'cypress', 'config', 'node_modules']
+        exclude: ['dist', 'packages', 'config', 'node_modules']
       }),
       ...optionalPlugins
     ],

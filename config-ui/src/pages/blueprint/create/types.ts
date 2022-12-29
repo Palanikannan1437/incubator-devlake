@@ -16,14 +16,12 @@
  *
  */
 
-export enum FromEnum {
-  project = 'project',
-  blueprint = 'blueprint'
-}
+import type { ConnectionItemType } from '@/store'
 
-export enum ModeEnum {
-  advanced = 'ADVANCED',
-  normal = 'NORMAL'
+import { ModeEnum } from '../types'
+
+export type BPConnectionItemType = ConnectionItemType & {
+  scope: Array<{ id: ID; entities: string[] }>
 }
 
 export type BPContextType = {
