@@ -119,6 +119,7 @@ module.exports = (env = {}) => {
       hot: true,
       port: 4000,
       host: '0.0.0.0',
+      disableHostCheck: true,
       historyApiFallback: true,
       proxy: {
         '/api': {
