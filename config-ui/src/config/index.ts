@@ -16,5 +16,6 @@
  *
  */
 
-export * from './cron'
-export * from './endpoint'
+export * from './cron';
+export * from './endpoint';
+export * from './entities';

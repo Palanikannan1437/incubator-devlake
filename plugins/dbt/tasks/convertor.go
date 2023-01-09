@@ -45,7 +45,6 @@ func DbtConverter(taskCtx core.SubTaskContext) errors.Error {
 	projectVars := data.Options.ProjectVars
 	args := data.Options.Args
 	failFast := data.Options.FailFast
-	threads := data.Options.Threads
 	noVersionCheck := data.Options.NoVersionCheck
 	excludeModels := data.Options.ExcludeModels
 	selector := data.Options.Selector
@@ -115,13 +114,21 @@ func DbtConverter(taskCtx core.SubTaskContext) errors.Error {
 	defaultPackagesPath := filepath.Join(projectPath, "packages.yml")
 	_, err = errors.Convert01(os.Stat(defaultPackagesPath))
 	if err == nil {
-		cmd := exec.Command("dbt", "deps")
-		err = errors.Convert(cmd.Start())
-		if err != nil {
+		cmdDeps := exec.Command("dbt", "deps")
+		log.Info("dbt deps run script: ", cmdDeps)
+		// prevent zombie process
+		defer func() {
+			if err := errors.Convert(cmdDeps.Wait()); err != nil {
+				log.Error(nil, "dbt deps run cmd.cmdDeps() error")
+			}
+		}()
+		if err = errors.Convert(cmdDeps.Start()); err != nil {
 			return err
 		}
+
 	}
-	dbtExecParams := []string{"dbt", "run", "--project-dir", projectPath}
+	//set default threads = 1, prevent dbt threads can not release, so occur zombie process
+	dbtExecParams := []string{"dbt", "run", "--project-dir", projectPath, "--threads", "1"}
 	if projectVars != nil {
 		jsonProjectVars, err := json.Marshal(projectVars)
 		if err != nil {
@@ -139,10 +146,6 @@ func DbtConverter(taskCtx core.SubTaskContext) errors.Error {
 	}
 	if failFast {
 		dbtExecParams = append(dbtExecParams, "--fail-fast")
-	}
-	if threads != 0 {
-		dbtExecParams = append(dbtExecParams, "--threads")
-		dbtExecParams = append(dbtExecParams, strconv.Itoa(threads))
 	}
 	if noVersionCheck {
 		dbtExecParams = append(dbtExecParams, "--no-version-check")
@@ -181,21 +184,26 @@ func DbtConverter(taskCtx core.SubTaskContext) errors.Error {
 		dbtExecParams = append(dbtExecParams, profile)
 	}
 	cmd := exec.Command(dbtExecParams[0], dbtExecParams[1:]...)
-	log.Info("dbt run script: %v", cmd)
-	stdout, _ := cmd.StdoutPipe()
-	err = errors.Convert(cmd.Start())
-	if err != nil {
+	log.Info("dbt run script: ", cmd)
+
+	stdout, stdoutErr := cmd.StdoutPipe()
+	if stdoutErr != nil {
+		return errors.Convert(stdoutErr)
+	}
+
+	if err = errors.Convert(cmd.Start()); err != nil {
 		return err
 	}
-	// ProcessState contains information about an exited process, available after a call to Wait.
-	defer func() {
-		if !cmd.ProcessState.Success() {
-			log.Error(nil, "dbt run task error, please check!!!")
-		}
-	}()
 
 	// prevent zombie process
-	defer cmd.Wait() //nolint
+	defer func() {
+		err := errors.Convert(cmd.Wait())
+		if err != nil {
+			log.Error(err, "The DBT project run failed!")
+		} else {
+			log.Info("The DBT project run ended.")
+		}
+	}()
 
 	scanner := bufio.NewScanner(stdout)
 	var errStr string
@@ -210,7 +218,14 @@ func DbtConverter(taskCtx core.SubTaskContext) errors.Error {
 		}
 	}
 	if err := errors.Convert(scanner.Err()); err != nil {
+		log.Error(err, "dbt read stdout failed.")
 		return err
+	}
+
+	// close stdout
+	if closeErr := stdout.Close(); closeErr != nil && err == nil {
+		log.Error(closeErr, "dbt close stdout failed.")
+		return errors.Convert(closeErr)
 	}
 
 	return nil

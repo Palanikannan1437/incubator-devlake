@@ -16,22 +16,22 @@
  *
  */
 
-import React, { useState, useEffect } from 'react'
-import { MenuItem, Checkbox, Intent } from '@blueprintjs/core'
-import { MultiSelect } from '@blueprintjs/select'
+import React, { useState, useEffect } from 'react';
+import { MenuItem, Checkbox, Intent } from '@blueprintjs/core';
+import { MultiSelect2 } from '@blueprintjs/select';
 
 interface Props<T> {
-  placeholder?: string
-  loading?: boolean
-  items: T[]
-  disabledItems?: T[]
-  getKey?: (item: T) => string | number
-  getName?: (item: T) => string
-  getIcon?: (item: T) => string
-  selectedItems?: T[]
-  onChangeItems?: (selectedItems: T[]) => void
-  noResult?: string
-  onQueryChange?: (query: string) => void
+  placeholder?: string;
+  loading?: boolean;
+  items: T[];
+  disabledItems?: T[];
+  getKey?: (item: T) => string | number;
+  getName?: (item: T) => string;
+  getIcon?: (item: T) => string;
+  selectedItems?: T[];
+  onChangeItems?: (selectedItems: T[]) => void;
+  noResult?: string;
+  onQueryChange?: (query: string) => void;
 }
 
 export const MultiSelector = <T,>({
@@ -47,86 +47,78 @@ export const MultiSelector = <T,>({
   onQueryChange,
   ...props
 }: Props<T>) => {
-  const [selectedItems, setSelectedItems] = useState<T[]>([])
+  const [selectedItems, setSelectedItems] = useState<T[]>([]);
 
   useEffect(() => {
-    setSelectedItems(props.selectedItems ?? [])
-  }, [props.selectedItems])
+    setSelectedItems(props.selectedItems ?? []);
+  }, [props.selectedItems]);
 
   const tagRenderer = (item: T) => {
-    const name = getName(item)
-    return <span>{name}</span>
-  }
+    const name = getName(item);
+    return <span>{name}</span>;
+  };
 
   const itemRenderer = (item: T, { handleClick }: any) => {
-    const key = getKey(item)
-    const name = getName(item)
-    const icon = getIcon?.(item)
-    const selected = !!selectedItems.find((it) => getKey(it) === key)
-    const disabled = !!disabledItems.find((it) => getKey(it) === key)
+    const key = getKey(item);
+    const name = getName(item);
+    const icon = getIcon?.(item);
+    const selected = !!selectedItems.find((it) => getKey(it) === key);
+    const disabled = !!disabledItems.find((it) => getKey(it) === key);
 
     return (
       <MenuItem
         key={key}
         disabled={selected || disabled}
         onClick={(e) => {
-          e.preventDefault()
-          handleClick()
+          e.preventDefault();
+          handleClick();
         }}
-        labelElement={icon ? <img src={icon} width={16} alt='' /> : null}
-        text={
-          <Checkbox
-            disabled={selected || disabled}
-            checked={selected || disabled}
-            readOnly
-            label={name}
-          />
-        }
+        labelElement={icon ? <img src={icon} width={16} alt="" /> : null}
+        text={<Checkbox disabled={selected || disabled} checked={selected || disabled} readOnly label={name} />}
       />
-    )
-  }
+    );
+  };
 
   const handleItemSelect = (item: T) => {
-    const newSelectedItems = [...selectedItems, item]
+    const newSelectedItems = [...selectedItems, item];
     if (onChangeItems) {
-      onChangeItems(newSelectedItems)
+      onChangeItems(newSelectedItems);
     } else {
-      setSelectedItems(newSelectedItems)
+      setSelectedItems(newSelectedItems);
     }
-  }
+  };
 
   const handleItemRemove = (item: T) => {
-    const newSelectedItems = selectedItems.filter(
-      (it) => getKey(it) !== getKey(item)
-    )
+    const newSelectedItems = selectedItems.filter((it) => getKey(it) !== getKey(item));
     if (onChangeItems) {
-      onChangeItems(newSelectedItems)
+      onChangeItems(newSelectedItems);
     } else {
-      setSelectedItems(newSelectedItems)
+      setSelectedItems(newSelectedItems);
     }
-  }
+  };
 
   return (
-    <MultiSelect
+    <MultiSelect2
       fill
       resetOnSelect
       placeholder={placeholder ?? 'Select...'}
       items={items}
+      // https://github.com/palantir/blueprint/issues/3596
+      // set activeItem to null will fixed the scrollBar to top when the selectedItems changed
+      activeItem={null}
       selectedItems={selectedItems}
       itemRenderer={itemRenderer}
       tagRenderer={tagRenderer}
       tagInputProps={{
         tagProps: {
           intent: Intent.PRIMARY,
-          minimal: true
-        }
+          minimal: true,
+        },
       }}
       onItemSelect={handleItemSelect}
       onRemove={handleItemRemove}
       onQueryChange={onQueryChange}
-      noResults={
-        <MenuItem disabled={true} text={loading ? 'Fetching...' : noResult} />
-      }
+      noResults={<MenuItem disabled={true} text={loading ? 'Fetching...' : noResult} />}
     />
-  )
-}
+  );
+};

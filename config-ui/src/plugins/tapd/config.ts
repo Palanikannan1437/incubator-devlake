@@ -16,14 +16,65 @@
  *
  */
 
-import type { PluginConfigType } from '@/plugins'
-import { Plugins, PluginType } from '@/plugins'
+import type { PluginConfigType } from '@/plugins';
+import { Plugins, PluginType } from '@/plugins';
 
-import Icon from './assets/icon.svg'
+import Icon from './assets/icon.svg';
 
 export const TAPDConfig: PluginConfigType = {
   plugin: Plugins.TAPD,
   name: 'TAPD',
-  type: PluginType.Pipeline,
-  icon: Icon
-}
+  type: PluginType.Connection,
+  isBeta: true,
+  icon: Icon,
+  connection: {
+    initialValues: {
+      rateLimitPerHour: 3000,
+    },
+    fields: [
+      {
+        key: 'name',
+        label: 'Connection Name',
+        type: 'text',
+        required: true,
+        placeholder: 'eg. TAPD',
+      },
+      {
+        key: 'endpoint',
+        label: 'Endpoint URL',
+        type: 'text',
+        required: true,
+        placeholder: 'eg. https://api.tapd.cn/',
+      },
+      {
+        key: 'username',
+        label: 'Username',
+        type: 'text',
+        required: true,
+        placeholder: 'eg. admin',
+      },
+      {
+        key: 'password',
+        label: 'Password',
+        type: 'password',
+        required: true,
+        placeholder: 'eg. ************',
+      },
+      {
+        key: 'proxy',
+        label: 'Proxy URL',
+        type: 'text',
+        placeholder: 'eg. http://proxy.localhost:8080',
+        tooltip: 'Add a proxy if your network can not access TAPD directly.',
+      },
+      {
+        key: 'rateLimitPerHour',
+        label: 'Fixed Rate Limit (per hour)',
+        type: 'rateLimit',
+        tooltip: 'Rate Limit requests per hour,\nEnter a numeric value > 0 to enable.',
+      },
+    ],
+  },
+  entities: ['TICKET'],
+  transformation: {},
+};

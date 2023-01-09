@@ -16,69 +16,72 @@
  *
  */
 
-import React, { useState, useEffect } from 'react'
-import MillerColumnsSelect from 'miller-columns-select'
+import React, { useState, useEffect } from 'react';
+import MillerColumnsSelect from 'miller-columns-select';
 
-import { Loading } from '@/components'
+import { Loading } from '@/components';
 
-import type { ScopeItemType } from '../../types'
+import type { ScopeItemType } from '../../types';
 
-import type { UseMillerColumnsProps } from './use-miller-columns'
-import { useMillerColumns } from './use-miller-columns'
+import type { UseMillerColumnsProps } from './use-miller-columns';
+import { useMillerColumns } from './use-miller-columns';
 
 interface Props extends UseMillerColumnsProps {
-  selectedItems: ScopeItemType[]
-  onChangeItems: (selectedItems: ScopeItemType[]) => void
+  disabledItems?: ScopeItemType[];
+  selectedItems?: ScopeItemType[];
+  onChangeItems?: (selectedItems: ScopeItemType[]) => void;
 }
 
-export const MillerColumns = ({
-  connectionId,
-  selectedItems,
-  onChangeItems
-}: Props) => {
-  const [seletedIds, setSelectedIds] = useState<ID[]>([])
+export const MillerColumns = ({ connectionId, disabledItems, selectedItems, onChangeItems }: Props) => {
+  const [disabledIds, setDisabledIds] = useState<ID[]>([]);
+  const [selectedIds, setSelectedIds] = useState<ID[]>([]);
 
   const { items, getHasMore, onExpandItem } = useMillerColumns({
-    connectionId
-  })
+    connectionId,
+  });
 
   const getJobFullName = (item: any): string => {
-    if (!item.parentId) return item.title
-    const parentItem = items.find((it) => it.id === item.parentId)
-    return `${getJobFullName(parentItem)}/${item.title}`
-  }
+    if (!item.parentId) return item.title;
+    const parentItem = items.find((it) => it.id === item.parentId);
+    return `${getJobFullName(parentItem)}/${item.title}`;
+  };
 
   useEffect(() => {
-    setSelectedIds(selectedItems.map((it) => it.jobFullName))
-  }, [])
+    setDisabledIds((disabledItems ?? []).map((it) => it.jobFullName));
+  }, [disabledItems]);
 
   useEffect(() => {
+    setSelectedIds((selectedItems ?? []).map((it) => it.jobFullName));
+  }, [selectedItems]);
+
+  const handleChangeItems = (selectedIds: ID[]) => {
     const result = items
-      .filter((it) => seletedIds.includes(it.id) && it.type !== 'folder')
+      .filter((it) => selectedIds.includes(it.id) && it.type !== 'folder')
       .map((it: any) => ({
         connectionId,
         jobFullName: getJobFullName(it),
         name: getJobFullName(it),
-      }))
+      }));
 
-    onChangeItems(result)
-  }, [seletedIds])
+    onChangeItems?.(result);
+  };
 
   const renderLoading = () => {
-    return <Loading size={20} style={{ padding: '4px 12px' }} />
-  }
+    return <Loading size={20} style={{ padding: '4px 12px' }} />;
+  };
 
   return (
     <MillerColumnsSelect
-      columnCount={2}
+      columnCount={2.5}
       columnHeight={300}
       getCanExpand={(it) => it.type === 'folder'}
       getHasMore={getHasMore}
       renderLoading={renderLoading}
       items={items}
-      selectedIds={seletedIds}
-      onSelectItemIds={setSelectedIds}
+      disabledIds={disabledIds}
+      selectedIds={selectedIds}
+      onSelectItemIds={handleChangeItems}
       onExpandItem={onExpandItem}
     />
-  )
-}
+  );
+};

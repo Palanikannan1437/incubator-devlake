@@ -16,86 +16,89 @@
  *
  */
 
-import React, { useEffect, useState } from 'react'
-import MillerColumnsSelect from 'miller-columns-select'
+import React, { useEffect, useState } from 'react';
+import { uniqWith, isEqual } from 'lodash';
+import MillerColumnsSelect from 'miller-columns-select';
 
-import { Loading } from '@/components'
+import { Loading } from '@/components';
 
-import type { ScopeItemType } from '../../types'
-import { ScopeFromEnum } from '../../types'
+import type { ScopeItemType } from '../../types';
 
-import type {
-  UseMillerColumnsProps,
-  GitLabColumnType
-} from './use-miller-columns'
-import { useMillerColumns } from './use-miller-columns'
-import * as S from './styled'
+import type { UseMillerColumnsProps, GitLabColumnType } from './use-miller-columns';
+import { useMillerColumns } from './use-miller-columns';
+import * as S from './styled';
 
 interface Props extends UseMillerColumnsProps {
-  disabledItems: ScopeItemType[]
-  selectedItems: ScopeItemType[]
-  onChangeItems: (selectedItems: ScopeItemType[]) => void
+  disabledItems?: ScopeItemType[];
+  selectedItems?: ScopeItemType[];
+  onChangeItems?: (selectedItems: ScopeItemType[]) => void;
 }
 
-export const MillerColumns = ({
-  connectionId,
-  disabledItems,
-  selectedItems,
-  onChangeItems
-}: Props) => {
-  const [seletedIds, setSelectedIds] = useState<ID[]>([])
+export const MillerColumns = ({ connectionId, disabledItems, selectedItems, onChangeItems }: Props) => {
+  const [disabledIds, setDisabledIds] = useState<ID[]>([]);
+  const [selectedIds, setSelectedIds] = useState<ID[]>([]);
 
   const { items, getHasMore, onExpandItem, onScrollColumn } = useMillerColumns({
-    connectionId
-  })
+    connectionId,
+  });
 
   useEffect(() => {
-    setSelectedIds(selectedItems.map((it) => it.gitlabId))
-  }, [])
+    setDisabledIds((disabledItems ?? []).map((it) => it.gitlabId));
+  }, [disabledItems]);
 
   useEffect(() => {
-    const result = items
-      .filter((it) => seletedIds.includes(it.id) && it.type === 'project')
-      .map((it) => ({
-        from: ScopeFromEnum.MILLER_COLUMNS,
-        connectionId,
-        gitlabId: it.id,
-        name: it.name,
-        pathWithNamespace: it.pathWithNamespace,
-        creatorId: it.creatorId,
-        defaultBranch: it.defaultBranch,
-        description: it.description,
-        openIssuesCount: it.openIssuesCount,
-        starCount: it.starCount,
-        visibility: it.visibility,
-        webUrl: it.webUrl,
-        httpUrlToRepo: it.httpUrlToRepo
-      }))
-    onChangeItems(result)
-  }, [seletedIds])
+    setSelectedIds((selectedItems ?? []).map((it) => it.gitlabId));
+  }, [selectedItems]);
+
+  const handleChangeItems = (selectedIds: ID[]) => {
+    const result = uniqWith(
+      [
+        ...items
+          .filter((it) => it.type === 'project')
+          .map((it) => ({
+            connectionId,
+            gitlabId: it.id,
+            name: it.name,
+            pathWithNamespace: it.pathWithNamespace,
+            creatorId: it.creatorId,
+            defaultBranch: it.defaultBranch,
+            description: it.description,
+            openIssuesCount: it.openIssuesCount,
+            starCount: it.starCount,
+            visibility: it.visibility,
+            webUrl: it.webUrl,
+            httpUrlToRepo: it.httpUrlToRepo,
+          })),
+        ...(selectedItems ?? []),
+      ],
+      isEqual,
+    ).filter((it) => selectedIds.includes(it.gitlabId));
+
+    onChangeItems?.(result);
+  };
 
   const renderTitle = (column: GitLabColumnType) => {
-    return !column.parentId && <S.ColumnTitle>Subgroups/Projects</S.ColumnTitle>
-  }
+    return !column.parentId && <S.ColumnTitle>Subgroups/Projects</S.ColumnTitle>;
+  };
 
   const renderLoading = () => {
-    return <Loading size={20} style={{ padding: '4px 12px' }} />
-  }
+    return <Loading size={20} style={{ padding: '4px 12px' }} />;
+  };
 
   return (
     <MillerColumnsSelect
-      columnCount={3}
+      columnCount={2.5}
       columnHeight={300}
       getCanExpand={(it) => it.type === 'group'}
       getHasMore={getHasMore}
       renderTitle={renderTitle}
       renderLoading={renderLoading}
       items={items}
-      selectedIds={seletedIds}
-      disabledIds={disabledItems.map((it) => it.gitlabId)}
-      onSelectItemIds={setSelectedIds}
+      disabledIds={disabledIds}
+      selectedIds={selectedIds}
+      onSelectItemIds={handleChangeItems}
       onExpandItem={onExpandItem}
       onScrollColumn={onScrollColumn}
     />
-  )
-}
+  );
+};

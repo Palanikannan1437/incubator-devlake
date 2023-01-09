@@ -18,6 +18,7 @@ limitations under the License.
 package runner
 
 import (
+	"context"
 	"time"
 
 	"github.com/apache/incubator-devlake/errors"
@@ -84,16 +85,10 @@ func runPipelineTasks(
 		err = runTasks(row)
 		if err != nil {
 			log.Error(err, "run tasks failed")
-			if !dbPipeline.SkipOnFail {
+			if errors.Is(err, context.Canceled) || !dbPipeline.SkipOnFail {
+				log.Info("return error")
 				return err
 			}
-		}
-
-		// update finishedTasks
-		err = db.UpdateColumn(dbPipeline, "finished_tasks", dal.Expr("finished_tasks + ?", len(row)))
-		if err != nil {
-			log.Error(err, "update pipeline state failed")
-			return err
 		}
 	}
 	log.Info("pipeline finished in %d ms: %v", time.Now().UnixMilli()-dbPipeline.BeganAt.UnixMilli(), err)

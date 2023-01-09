@@ -16,84 +16,90 @@
  *
  */
 
-import React, { useState, useMemo } from 'react'
-import { Icon } from '@blueprintjs/core'
+import React, { useState, useMemo } from 'react';
+import { Icon } from '@blueprintjs/core';
 
-import { Card, Table, Divider } from '@/components'
-import { useConnection } from '@/store'
-import { DataScope } from '@/plugins'
+import { Card, Table, Divider } from '@/components';
+import { useConnection } from '@/store';
+import { Plugins, DataScope } from '@/plugins';
 
-import type { BPConnectionItemType } from '../types'
-import { useCreateBP } from '../bp-context'
+import type { BPConnectionItemType } from '../types';
+import { useCreateBP } from '../bp-context';
 
-import { useColumns } from './use-columns'
+import { useColumns } from './use-columns';
 
 export const StepTwo = () => {
-  const [connection, setConnection] = useState<BPConnectionItemType>()
+  const [connection, setConnection] = useState<BPConnectionItemType>();
 
-  const { connections } = useConnection()
-  const { uniqueList, scopeMap, onChangeScopeMap, onChangeShowDetail } =
-    useCreateBP()
+  const { connections } = useConnection();
+  const { uniqueList, scopeMap, onChangeScopeMap, onChangeShowDetail } = useCreateBP();
 
   const handleGoDetail = (c: BPConnectionItemType) => {
-    setConnection(c)
-    onChangeShowDetail(true)
-  }
+    setConnection(c);
+    onChangeShowDetail(true);
+  };
 
   const handleBack = () => {
-    setConnection(undefined)
-    onChangeShowDetail(false)
-  }
+    setConnection(undefined);
+    onChangeShowDetail(false);
+  };
 
-  const handleSave = (scope: any) => {
-    if (!connection) return
+  const handleDeleteScope = (plugin: Plugins, connectionId: ID, scopeId: ID) => {
+    const unique = `${plugin}-${connectionId}`;
+
     onChangeScopeMap({
       ...scopeMap,
-      [`${connection.unique}`]: scope
-    })
-    handleBack()
-  }
+      [`${unique}`]: scopeMap[unique].filter((sc: any) => sc.id !== scopeId),
+    });
+  };
 
-  const columns = useColumns({ onDetail: handleGoDetail })
+  const handleSave = (scope: any) => {
+    if (!connection) return;
+    onChangeScopeMap({
+      ...scopeMap,
+      [`${connection.unique}`]: scope,
+    });
+    handleBack();
+  };
+
+  const columns = useColumns({ onDetail: handleGoDetail, onDelete: handleDeleteScope });
   const dataSource = useMemo(
     () =>
       uniqueList.map((unique) => {
-        const connection = connections.find(
-          (cs) => cs.unique === unique
-        ) as BPConnectionItemType
-        const scope = scopeMap[unique] ?? []
+        const connection = connections.find((cs) => cs.unique === unique) as BPConnectionItemType;
+        const scope = scopeMap[unique] ?? [];
         return {
           ...connection,
-          scope: scope.map((sc: any) => ({
-            id: `${sc.id}`,
-            entities: `${sc.entities}`
-          }))
-        }
+          scopeIds: scope.map((sc: any) => sc.id),
+        };
       }),
-    [uniqueList, connections, scopeMap]
-  )
+    [uniqueList, connections, scopeMap],
+  );
 
   return !connection ? (
     <Table columns={columns} dataSource={dataSource} />
   ) : (
     <Card>
-      <div className='back' onClick={handleBack}>
-        <Icon icon='arrow-left' size={14} />
+      <div className="back" onClick={handleBack}>
+        <Icon icon="arrow-left" size={14} />
         <span>Cancel and Go Back to the Data Scope List</span>
       </div>
       <h2>Add Data Scope</h2>
       <Divider />
-      <div className='connection'>
-        <img src={connection.icon} width={24} alt='' />
+      <div className="connection">
+        <img src={connection.icon} width={24} alt="" />
         <span>{connection.name}</span>
       </div>
       <DataScope
         plugin={connection.plugin}
         connectionId={connection.id}
         entities={connection.entities}
+        initialValues={{
+          scope: connection.scopeIds.map((id) => ({ id })),
+        }}
         onCancel={handleBack}
         onSave={handleSave}
       />
     </Card>
-  )
-}
+  );
+};

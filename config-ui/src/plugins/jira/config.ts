@@ -16,10 +16,10 @@
  *
  */
 
-import type { PluginConfigType } from '@/plugins'
-import { Plugins, PluginType } from '@/plugins'
+import type { PluginConfigType } from '@/plugins';
+import { Plugins, PluginType } from '@/plugins';
 
-import Icon from './assets/icon.svg'
+import Icon from './assets/icon.svg';
 
 export const JIRAConfig: PluginConfigType = {
   plugin: Plugins.JIRA,
@@ -27,27 +27,30 @@ export const JIRAConfig: PluginConfigType = {
   type: PluginType.Connection,
   icon: Icon,
   connection: {
+    initialValues: {
+      rateLimitPerHour: 3000,
+    },
     fields: [
       {
         key: 'name',
         label: 'Connection Name',
         type: 'text',
         required: true,
-        placeholder: 'eg. JIRA'
+        placeholder: 'eg. JIRA',
       },
       {
         key: 'endpoint',
         label: 'Endpoint URL',
         type: 'text',
         required: true,
-        placeholder: 'eg. https://your-domain.atlassian.net/rest/'
+        placeholder: 'eg. https://your-domain.atlassian.net/rest/',
       },
       {
         key: 'username',
         label: 'Username / E-mail',
         type: 'text',
         required: true,
-        placeholder: 'eg. admin'
+        placeholder: 'eg. admin',
       },
       {
         key: 'password',
@@ -55,29 +58,27 @@ export const JIRAConfig: PluginConfigType = {
         type: 'password',
         required: true,
         placeholder: 'eg. ************',
-        tooltip:
-          'If you are using JIRA Cloud or JIRA Server,\nyour API Token should be used as password.'
+        tooltip: 'If you are using JIRA Cloud or JIRA Server,\nyour API Token should be used as password.',
       },
       {
         key: 'proxy',
         label: 'Proxy URL',
         type: 'text',
-        placeholder: 'eg. http://proxy.localhost:8080'
+        placeholder: 'eg. http://proxy.localhost:8080',
+        tooltip: 'Add a proxy if your network can not access JIRA directly.',
       },
       {
         key: 'rateLimitPerHour',
-        label: 'Rate Limit (per hour)',
-        type: 'numeric',
-        tooltip:
-          'Rate Limit requests per hour,\nEnter a numeric value > 0 to enable.'
-      }
-    ]
+        label: 'Fixed Rate Limit (per hour)',
+        type: 'rateLimit',
+        tooltip: 'Rate Limit requests per hour,\nEnter a numeric value > 0 to enable.',
+      },
+    ],
   },
   entities: ['TICKET', 'CROSS'],
   transformation: {
-    epicKeyField: '',
     storyPointField: '',
     remotelinkCommitShaPattern: '',
-    typeMappings: {}
-  }
-}
+    typeMappings: {},
+  },
+};

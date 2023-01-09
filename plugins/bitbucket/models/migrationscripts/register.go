@@ -26,6 +26,7 @@ func All() []core.MigrationScript {
 	return []core.MigrationScript{
 		new(addInitTables20220803),
 		new(addPipeline20220914),
+		new(addPrCommits20221008),
 		new(addDeployment20221013),
 		new(addRepoIdAndCommitShaField20221014),
 	}

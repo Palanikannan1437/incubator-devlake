@@ -16,51 +16,41 @@
  *
  */
 
-import React from 'react'
-import { ButtonGroup, Button, Intent } from '@blueprintjs/core'
+import React from 'react';
+import { ButtonGroup, Button, Intent } from '@blueprintjs/core';
 
-import { Plugins } from '@/plugins'
-import { GitHubDataScope } from '@/plugins/github'
-import { JIRADataScope } from '@/plugins/jira'
-import { GitLabDataScope } from '@/plugins/gitlab'
-import { JenkinsDataScope } from '@/plugins/jenkins'
-import { MultiSelector } from '@/components'
+import { transformEntities } from '@/config';
+import { Plugins } from '@/plugins';
+import { GitHubDataScope } from '@/plugins/github';
+import { JIRADataScope } from '@/plugins/jira';
+import { GitLabDataScope } from '@/plugins/gitlab';
+import { JenkinsDataScope } from '@/plugins/jenkins';
+import { MultiSelector } from '@/components';
 
-import type { UseDataScope } from './use-data-scope'
-import { useDataScope } from './use-data-scope'
-import * as S from './styled'
+import type { UseDataScope } from './use-data-scope';
+import { useDataScope } from './use-data-scope';
+import * as S from './styled';
 
 interface Props extends UseDataScope {
-  onCancel?: () => void
+  onCancel?: () => void;
 }
 
-export const DataScope = ({
-  plugin,
-  connectionId,
-  entities,
-  onCancel,
-  ...props
-}: Props) => {
-  const {
-    saving,
-    selectedScope,
-    selectedEntities,
-    onChangeScope,
-    onChangeEntites,
-    onSave
-  } = useDataScope({
-    ...props,
-    plugin,
-    connectionId,
-    entities
-  })
+export const DataScope = ({ plugin, connectionId, entities, onCancel, ...props }: Props) => {
+  const { saving, disabledScope, selectedScope, selectedEntities, onChangeScope, onChangeEntites, onSave } =
+    useDataScope({
+      ...props,
+      plugin,
+      connectionId,
+      entities,
+    });
 
   return (
     <S.Wrapper>
-      <div className='block'>
+      <div className="block">
         {plugin === Plugins.GitHub && (
           <GitHubDataScope
             connectionId={connectionId}
+            disabledItems={disabledScope}
             selectedItems={selectedScope}
             onChangeItems={onChangeScope}
           />
@@ -69,6 +59,7 @@ export const DataScope = ({
         {plugin === Plugins.JIRA && (
           <JIRADataScope
             connectionId={connectionId}
+            disabledItems={disabledScope}
             selectedItems={selectedScope}
             onChangeItems={onChangeScope}
           />
@@ -77,6 +68,7 @@ export const DataScope = ({
         {plugin === Plugins.GitLab && (
           <GitLabDataScope
             connectionId={connectionId}
+            disabledItems={disabledScope}
             selectedItems={selectedScope}
             onChangeItems={onChangeScope}
           />
@@ -85,43 +77,45 @@ export const DataScope = ({
         {plugin === Plugins.Jenkins && (
           <JenkinsDataScope
             connectionId={connectionId}
+            disabledItems={disabledScope}
             selectedItems={selectedScope}
             onChangeItems={onChangeScope}
           />
         )}
       </div>
 
-      <div className='block'>
+      <div className="block">
         <h3>Data Entities</h3>
         <p>
-          <span>
-            Select the data entities you wish to collect for the projects.
-          </span>
+          <span>Select the data entities you wish to collect for the projects.</span>
           <a
-            href='https://devlake.apache.org/docs/DataModels/DevLakeDomainLayerSchema/'
-            target='_blank'
+            href="https://devlake.apache.org/docs/DataModels/DevLakeDomainLayerSchema/#data-models"
+            target="_blank"
+            rel="noreferrer"
           >
             Learn about data entities
           </a>
         </p>
         <MultiSelector
-          items={entities}
+          items={transformEntities(entities)}
+          getKey={(item) => item.value}
+          getName={(item) => item.label}
           selectedItems={selectedEntities}
           onChangeItems={onChangeEntites}
         />
       </div>
 
       <ButtonGroup>
-        <Button outlined disabled={saving} text='Cancel' onClick={onCancel} />
+        <Button outlined disabled={saving} text="Cancel" onClick={onCancel} />
         <Button
           outlined
           intent={Intent.PRIMARY}
           loading={saving}
           disabled={!selectedScope.length || !selectedEntities.length}
-          text='Save'
+          text="Save"
           onClick={onSave}
         />
       </ButtonGroup>
     </S.Wrapper>
-  )
-}
+  );
+};

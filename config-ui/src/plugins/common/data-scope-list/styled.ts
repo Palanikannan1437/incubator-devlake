@@ -16,13 +16,13 @@
  *
  */
 
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const ScopeList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-`
+`;
 
 export const ScopeItem = styled.li`
   margin-bottom: 4px;
@@ -30,44 +30,46 @@ export const ScopeItem = styled.li`
   &:last-child {
     margin-bottom: 0;
   }
-`
+
+  .bp4-button {
+    margin-left: 6px;
+  }
+`;
 
 export const ScopeItemMap = styled(ScopeItem)`
   margin-bottom: 12px;
 
-  .name {
+  .title {
     display: flex;
     align-items: center;
     font-size: 12px;
 
-    & > span {
+    span {
       font-weight: 600;
     }
 
-    .action {
-      margin-left: 8px;
-
-      & > span {
-        font-size: 11px;
-        color: #7497f7;
-        cursor: pointer;
-
-        &:hover {
-          color: #106ba3;
-        }
-      }
-
-      span + span {
-        margin-left: 4px;
-      }
+    span.bp4-icon {
+      margin-right: 6px;
     }
   }
 
-  ul {
+  & > ul {
     margin: 0;
     padding: 0;
     list-style: none;
     padding-left: 24px;
     margin-top: 4px;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      span.name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
-`
+`;
