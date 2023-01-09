@@ -16,7 +16,11 @@
  *
  */
 
-import styled from 'styled-components'
+import styled from 'styled-components';
+
+export const Wrapper = styled.div`
+  padding-bottom: 24px;
+`;
 
 export const ConfigurationPanel = styled.div`
   .top {
@@ -47,7 +51,7 @@ export const ConfigurationPanel = styled.div`
       text-align: right;
     }
   }
-`
+`;
 
 export const ConnectionColumn = styled.div`
   display: flex;
@@ -57,7 +61,7 @@ export const ConnectionColumn = styled.div`
     margin-right: 4px;
     width: 20px;
   }
-`
+`;
 
 export const ActionColumn = styled.div`
   display: inline-flex;
@@ -75,7 +79,7 @@ export const ActionColumn = styled.div`
       margin-right: 4px;
     }
   }
-`
+`;
 
 export const StatusPanel = styled.div`
   & > .info {
@@ -95,4 +99,21 @@ export const StatusPanel = styled.div`
   .block + .block {
     margin-top: 32px;
   }
-`
+`;
+
+export const JenkinsTips = styled.div`
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 200px;
+  background-color: #3c5088;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+
+  p {
+    margin: 0;
+    color: #fff;
+  }
+`;

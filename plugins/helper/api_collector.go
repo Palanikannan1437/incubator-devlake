@@ -119,9 +119,9 @@ func NewApiCollector(args ApiCollectorArgs) (*ApiCollector, errors.Error) {
 	}
 	if args.AfterResponse != nil {
 		apiCollector.SetAfterResponse(args.AfterResponse)
-	} else if apiCollector.GetAfterResponse() == nil {
+	} else {
 		apiCollector.SetAfterResponse(func(res *http.Response) errors.Error {
-			if res.StatusCode == http.StatusUnauthorized {
+			if res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusUnprocessableEntity {
 				return errors.Unauthorized.New("authentication failed, please check your AccessToken")
 			}
 			return nil
@@ -168,7 +168,8 @@ func (collector *ApiCollector) Execute() errors.Error {
 					break
 				}
 			}
-			input, err := iterator.Fetch()
+			var input interface{}
+			input, err = iterator.Fetch()
 			if err != nil {
 				break
 			}

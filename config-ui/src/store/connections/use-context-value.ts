@@ -16,58 +16,57 @@
  *
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import type { PluginConfigConnectionType } from '@/plugins'
-import { Plugins, PluginConfig, PluginType } from '@/plugins'
+import type { PluginConfigConnectionType } from '@/plugins';
+import { Plugins, PluginConfig, PluginType } from '@/plugins';
 
-import type { ConnectionItemType } from './types'
-import { ConnectionStatusEnum } from './types'
-import * as API from './api'
+import type { ConnectionItemType } from './types';
+import { ConnectionStatusEnum } from './types';
+import * as API from './api';
 
 export interface UseContextValueProps {
-  plugin?: Plugins
+  plugin?: Plugins;
+  filterBeta?: boolean;
 }
 
-export const useContextValue = ({ plugin }: UseContextValueProps) => {
-  const [loading, setLoading] = useState(false)
-  const [connections, setConnections] = useState<ConnectionItemType[]>([])
+export const useContextValue = ({ plugin, filterBeta = false }: UseContextValueProps) => {
+  const [loading, setLoading] = useState(false);
+  const [connections, setConnections] = useState<ConnectionItemType[]>([]);
 
   const allConnections = useMemo(
     () =>
-      PluginConfig.filter((p) => p.type === PluginType.Connection).filter((p) =>
-        plugin ? p.plugin === plugin : true
-      ) as PluginConfigConnectionType[],
-    [plugin]
-  )
+      (PluginConfig.filter((p) => p.type === PluginType.Connection) as PluginConfigConnectionType[])
+        .filter((p) => (plugin ? p.plugin === plugin : true))
+        .filter((p) => (filterBeta ? !p.isBeta : true)),
+    [plugin],
+  );
 
   const getConnection = async (plugin: string) => {
     try {
-      return await API.getConnection(plugin)
+      return await API.getConnection(plugin);
     } catch {
-      return []
+      return [];
     }
-  }
+  };
 
   const handleRefresh = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
 
-    const res = await Promise.all(
-      allConnections.map((cs) => getConnection(cs.plugin))
-    )
+    const res = await Promise.all(allConnections.map((cs) => getConnection(cs.plugin)));
 
     const resWithPlugin = res.map((cs, i) =>
       cs.map((it: any) => {
-        const { plugin, icon, entities } = allConnections[i]
+        const { plugin, icon, entities } = allConnections[i];
 
         return {
           ...it,
           plugin,
           icon,
-          entities
-        }
-      })
-    )
+          entities,
+        };
+      }),
+    );
 
     setConnections(
       resWithPlugin.flat().map((it) => ({
@@ -82,16 +81,16 @@ export const useContextValue = ({ plugin }: UseContextValueProps) => {
         proxy: it.proxy,
         token: it.token,
         username: it.username,
-        password: it.password
-      }))
-    )
+        password: it.password,
+      })),
+    );
 
-    setLoading(false)
-  }, [allConnections])
+    setLoading(false);
+  }, [allConnections]);
 
   useEffect(() => {
-    handleRefresh()
-  }, [allConnections])
+    handleRefresh();
+  }, [allConnections]);
 
   const handleTest = useCallback(
     async (selectedConnection: ConnectionItemType) => {
@@ -100,16 +99,15 @@ export const useContextValue = ({ plugin }: UseContextValueProps) => {
           cs.unique === selectedConnection.unique
             ? {
                 ...cs,
-                status: ConnectionStatusEnum.TESTING
+                status: ConnectionStatusEnum.TESTING,
               }
-            : cs
-        )
-      )
+            : cs,
+        ),
+      );
 
-      const { plugin, endpoint, proxy, token, username, password } =
-        selectedConnection
+      const { plugin, endpoint, proxy, token, username, password } = selectedConnection;
 
-      let status = ConnectionStatusEnum.OFFLINE
+      let status = ConnectionStatusEnum.OFFLINE;
 
       try {
         const res = await API.testConnection(plugin, {
@@ -117,13 +115,11 @@ export const useContextValue = ({ plugin }: UseContextValueProps) => {
           proxy,
           token,
           username,
-          password
-        })
-        status = res.success
-          ? ConnectionStatusEnum.ONLINE
-          : ConnectionStatusEnum.OFFLINE
+          password,
+        });
+        status = res.success ? ConnectionStatusEnum.ONLINE : ConnectionStatusEnum.OFFLINE;
       } catch {
-        status = ConnectionStatusEnum.OFFLINE
+        status = ConnectionStatusEnum.OFFLINE;
       }
 
       setConnections((connections) =>
@@ -131,22 +127,22 @@ export const useContextValue = ({ plugin }: UseContextValueProps) => {
           cs.unique === selectedConnection.unique
             ? {
                 ...cs,
-                status
+                status,
               }
-            : cs
-        )
-      )
+            : cs,
+        ),
+      );
     },
-    [connections]
-  )
+    [connections],
+  );
 
   return useMemo(
     () => ({
       loading,
       connections,
       onRefresh: handleRefresh,
-      onTest: handleTest
+      onTest: handleTest,
     }),
-    [loading, connections]
-  )
-}
+    [loading, connections],
+  );
+};

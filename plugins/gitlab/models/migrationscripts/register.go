@@ -30,5 +30,6 @@ func All() []core.MigrationScript {
 		new(addPipelineProjects),
 		new(fixDurationToFloat8),
 		new(addTransformationRule20221125),
+		new(addStdTypeToIssue221230),
 	}
 }

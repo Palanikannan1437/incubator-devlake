@@ -16,8 +16,7 @@
  *
  */
 
-export * from './update-name-dialog'
-export * from './update-policy-dialog'
-export * from './update-scope-dialog'
-export * from './update-transformation-dialog'
-export * from './pipeline-list'
+export * from './update-name-dialog';
+export * from './update-policy-dialog';
+export * from './add-scope-dialog';
+export * from './update-transformation-dialog';

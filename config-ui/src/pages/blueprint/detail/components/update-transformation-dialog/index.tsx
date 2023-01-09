@@ -16,48 +16,45 @@
  *
  */
 
-import React from 'react'
+import React from 'react';
 
-import { Dialog } from '@/components'
-import { Transformation } from '@/plugins'
+import { Dialog } from '@/components';
+import { Transformation } from '@/plugins';
 
-import type { ConfigConnectionItemType } from '../../types'
+import type { ConfigConnectionItemType } from '../../types';
 
 interface Props {
-  connection?: ConfigConnectionItemType
-  onCancel: () => void
-  onRefresh: () => void
+  connection?: ConfigConnectionItemType;
+  onCancel: () => void;
+  onRefresh: () => void;
 }
 
-export const UpdateTransformationDialog = ({
-  connection,
-  onCancel,
-  onRefresh
-}: Props) => {
-  if (!connection) return null
+export const UpdateTransformationDialog = ({ connection, onCancel, onRefresh }: Props) => {
+  if (!connection) return null;
 
-  const { plugin, connectionId, scopeIds } = connection
+  const { plugin, connectionId, scope } = connection;
 
   const handleSaveAfter = () => {
-    onRefresh()
-    onCancel()
-  }
+    onRefresh();
+    onCancel();
+  };
 
   return (
     <Dialog
       isOpen
-      title='Change Data Scope'
+      title="Assign a different transformation by"
       footer={null}
       style={{ width: 900 }}
       onCancel={onCancel}
     >
       <Transformation
+        from="update"
         plugin={plugin}
         connectionId={connectionId}
-        scopeIds={scopeIds}
+        scopeIds={scope.map((sc) => sc.id)}
         onCancel={onCancel}
         onSave={handleSaveAfter}
       />
     </Dialog>
-  )
-}
+  );
+};

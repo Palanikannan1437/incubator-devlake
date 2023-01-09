@@ -16,54 +16,69 @@
  *
  */
 
-import React from 'react'
+import React from 'react';
+import { Button, Icon, Intent, Position } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 
-import { Loading } from '@/components'
+import { Loading, DeleteButton } from '@/components';
+import { Plugins } from '@/plugins';
 
-import type { UseDataScopeList } from './use-data-scope-list'
-import { useDataScopeList } from './use-data-scope-list'
-import * as S from './styled'
+import type { UseDataScopeList } from './use-data-scope-list';
+import { useDataScopeList } from './use-data-scope-list';
+import * as S from './styled';
 
 interface Props extends UseDataScopeList {
-  groupByTs: boolean
+  groupByTs: boolean;
+  scopeIds: string[];
+  onDelete?: (plugin: Plugins, connectionId: ID, scopeId: ID) => void;
 }
 
-export const DataScopeList = ({ groupByTs, ...props }: Props) => {
-  const { loading, scope, scopeTsMap } = useDataScopeList({ ...props })
+export const DataScopeList = ({ groupByTs, scopeIds, onDelete, ...props }: Props) => {
+  const { loading, scope, scopeTsMap } = useDataScopeList({ scopeIds, ...props });
 
   if (!scope.length) {
-    return <span>No Data Scope Selected</span>
+    return <span>No Data Scope Selected</span>;
   }
 
   if (loading) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
     <S.ScopeList>
       {!groupByTs &&
-        scope.map((sc) => <S.ScopeItem key={sc.id}>{sc.name}</S.ScopeItem>)}
+        scope.map((sc) => (
+          <S.ScopeItem key={sc.id}>
+            <span>{sc.name}</span>
+            <DeleteButton onDelete={() => onDelete?.(props.plugin, props.connectionId, sc.id)}>
+              <Button small minimal intent={Intent.PRIMARY} icon="cross" />
+            </DeleteButton>
+          </S.ScopeItem>
+        ))}
 
       {groupByTs &&
         Object.keys(scopeTsMap).map((name) => (
           <S.ScopeItemMap key={name}>
-            <div className='name'>
+            <div className="title">
+              <Icon icon="function" />
               <span>{name}</span>
-              {name !== 'No Transformation' && (
-                <div className='action'>
-                  {/* <span onClick={() => onUpdateScope(scopeTsMap[name])}>
-                Remove
-              </span> */}
-                </div>
-              )}
             </div>
             <ul>
               {scopeTsMap[name].map((sc) => (
-                <li key={sc.id}>{sc.name}</li>
+                <li key={sc.id}>
+                  <Tooltip2 className="name" content={sc.name} position={Position.TOP}>
+                    <span>{sc.name}</span>
+                  </Tooltip2>
+                  {onDelete && scopeIds.length > 1 && (
+                    <DeleteButton onDelete={() => onDelete(props.plugin, props.connectionId, sc.id)}>
+                      <Button small minimal intent={Intent.PRIMARY} icon="cross" />
+                    </DeleteButton>
+                  )}
+                </li>
               ))}
             </ul>
           </S.ScopeItemMap>
         ))}
     </S.ScopeList>
-  )
-}
+  );
+};

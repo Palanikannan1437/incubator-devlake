@@ -19,12 +19,11 @@ package tasks
 
 import (
 	"encoding/json"
-	"github.com/apache/incubator-devlake/errors"
-	"github.com/apache/incubator-devlake/models/domainlayer/ticket"
 	"regexp"
 
+	"github.com/apache/incubator-devlake/errors"
+	"github.com/apache/incubator-devlake/models/domainlayer/ticket"
 	"github.com/apache/incubator-devlake/plugins/core"
-
 	"github.com/apache/incubator-devlake/plugins/gitlab/models"
 	"github.com/apache/incubator-devlake/plugins/helper"
 )
@@ -227,19 +226,22 @@ func ExtractApiIssues(taskCtx core.SubTaskContext) errors.Error {
 
 				if issueTypeBugRegex != nil {
 					if ok := issueTypeBugRegex.MatchString(label); ok {
-						gitlabIssue.Type = ticket.BUG
+						gitlabIssue.StdType = ticket.BUG
+						gitlabIssue.Type = label
 					}
 				}
 
 				if issueTypeRequirementRegex != nil {
 					if ok := issueTypeRequirementRegex.MatchString(label); ok {
-						gitlabIssue.Type = ticket.REQUIREMENT
+						gitlabIssue.StdType = ticket.REQUIREMENT
+						gitlabIssue.Type = label
 					}
 				}
 
 				if issueTypeIncidentRegex != nil {
 					if ok := issueTypeIncidentRegex.MatchString(label); ok {
-						gitlabIssue.Type = ticket.INCIDENT
+						gitlabIssue.StdType = ticket.INCIDENT
+						gitlabIssue.Type = label
 					}
 				}
 			}

@@ -16,6 +16,5 @@
  *
  */
 
-export * from './workflow'
-export * from './action'
-export * from './inspector'
+export * from './workflow';
+export * from './action';

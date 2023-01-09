@@ -16,119 +16,50 @@
  *
  */
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { useParams, useHistory } from 'react-router-dom'
-import { omit, pick } from 'lodash'
-import {
-  FormGroup,
-  InputGroup,
-  NumericInput,
-  Switch,
-  ButtonGroup,
-  Button,
-  Icon,
-  Intent,
-  Position
-} from '@blueprintjs/core'
-import { Tooltip2 } from '@blueprintjs/popover2'
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
+import { pick } from 'lodash';
+import { FormGroup, InputGroup, Switch, ButtonGroup, Button, Icon, Intent, Position } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 
-import { PageHeader, Card, PageLoading } from '@/components'
-import type { PluginConfigConnectionType } from '@/plugins'
-import { Plugins, PluginConfig } from '@/plugins'
+import { PageHeader, Card, PageLoading } from '@/components';
+import type { PluginConfigConnectionType } from '@/plugins';
+import { Plugins, PluginConfig } from '@/plugins';
 
-import { useForm } from './use-form'
-import * as S from './styled'
+import { GitHubToken, RateLimit } from './components';
+import { useForm } from './use-form';
+import * as S from './styled';
 
 export const ConnectionFormPage = () => {
-  const [form, setForm] = useState<Record<string, any>>({})
-  const [showRateLimit, setShowRateLimit] = useState(false)
-  const [githubTokens, setGitHubTokens] = useState<Record<string, string>>({})
+  const [form, setForm] = useState<Record<string, any>>({});
 
-  const history = useHistory()
-  const { plugin, cid } = useParams<{ plugin: Plugins; cid?: string }>()
-  const { loading, operating, connection, onTest, onCreate, onUpdate } =
-    useForm({ plugin, id: cid })
+  const history = useHistory();
+  const { plugin, cid } = useParams<{ plugin: Plugins; cid?: string }>();
+  const { loading, operating, connection, onTest, onCreate, onUpdate } = useForm({ plugin, id: cid });
 
   const {
     name,
-    connection: { initialValues, fields }
-  } = useMemo(
-    () =>
-      PluginConfig.find(
-        (p) => p.plugin === plugin
-      ) as PluginConfigConnectionType,
-    [plugin]
-  )
+    connection: { initialValues, fields },
+  } = useMemo(() => PluginConfig.find((p) => p.plugin === plugin) as PluginConfigConnectionType, [plugin]);
 
   useEffect(() => {
     setForm({
       ...form,
-      ...(initialValues ?? {}),
-      ...(connection ?? {})
-    })
-
-    setGitHubTokens(
-      (connection?.token ?? '')
-        .split(',')
-        .reduce((acc: any, cur: string, index: number) => {
-          acc[index] = cur
-          return acc
-        }, {} as any)
-    )
-
-    setShowRateLimit(connection?.rateLimitPerHour ? true : false)
-  }, [initialValues, connection])
-
-  useEffect(() => {
-    setForm({
-      ...form,
-      token: Object.values(githubTokens).filter(Boolean).join(',')
-    })
-  }, [githubTokens])
+      ...(connection ?? {}),
+    });
+  }, [initialValues, connection]);
 
   const error = useMemo(
-    () =>
-      !!(fields.filter((field) => field.required) ?? []).find(
-        (field) => !form[field.key]
-      ),
-    [form, fields]
-  )
-
-  const handleChangeGitHubToken = (key: string, token: string) => {
-    setGitHubTokens({
-      ...githubTokens,
-      [key]: token
-    })
-  }
-
-  const handleCreateToken = () => {
-    const keys = Object.keys(githubTokens)
-    setGitHubTokens({
-      ...githubTokens,
-      [+keys[keys.length - 1] + 1]: ''
-    })
-  }
-
-  const handleRemoveToken = (key: string) => {
-    setGitHubTokens(omit(githubTokens, [key]))
-  }
+    () => !!(fields.filter((field) => field.required) ?? []).find((field) => !form[field.key]),
+    [form, fields],
+  );
 
   const handleTest = () =>
-    onTest(
-      pick(form, [
-        'endpoint',
-        'token',
-        'username',
-        'password',
-        'app_id',
-        'secret_key',
-        'proxy'
-      ])
-    )
+    onTest(pick(form, ['endpoint', 'token', 'username', 'password', 'app_id', 'secret_key', 'proxy']));
 
-  const handleCancel = () => history.push(`/connections/${plugin}`)
+  const handleCancel = () => history.push(`/connections/${plugin}`);
 
-  const handleSave = () => (cid ? onUpdate(cid, form) : onCreate(form))
+  const handleSave = () => (cid ? onUpdate(cid, form) : onCreate(form));
 
   const getFormItem = ({
     key,
@@ -136,7 +67,7 @@ export const ConnectionFormPage = () => {
     type,
     required,
     placeholder,
-    tooltip
+    tooltip,
   }: PluginConfigConnectionType['connection']['fields']['0']) => {
     return (
       <FormGroup
@@ -147,7 +78,7 @@ export const ConnectionFormPage = () => {
             <span>{label}</span>
             {tooltip && (
               <Tooltip2 position={Position.TOP} content={tooltip}>
-                <Icon icon='help' size={12} />
+                <Icon icon="help" size={12} />
               </Tooltip2>
             )}
           </S.Label>
@@ -165,91 +96,70 @@ export const ConnectionFormPage = () => {
         {type === 'password' && (
           <InputGroup
             placeholder={placeholder}
-            type='password'
+            type="password"
             value={form[key] ?? ''}
             onChange={(e) => setForm({ ...form, [`${key}`]: e.target.value })}
           />
         )}
-        {type === 'numeric' && (
-          <S.RateLimit>
-            {showRateLimit && (
-              <NumericInput
-                placeholder={placeholder}
-                value={form[key]}
-                onValueChange={(value) =>
-                  setForm({
-                    ...form,
-                    [key]: value
-                  })
-                }
-              />
-            )}
+        {type === 'switch' && (
+          <S.SwitchWrapper>
             <Switch
-              checked={showRateLimit}
+              checked={form[key] ?? initialValues?.[key] ?? false}
               onChange={(e) =>
-                setShowRateLimit((e.target as HTMLInputElement).checked)
+                setForm({
+                  ...form,
+                  [key]: (e.target as HTMLInputElement).checked,
+                })
               }
             />
-          </S.RateLimit>
+          </S.SwitchWrapper>
         )}
-        {type === 'switch' && (
-          <Switch
-            checked={form[key] ?? false}
-            onChange={(e) =>
+        {type === 'rateLimit' && (
+          <RateLimit
+            initialValue={initialValues?.rateLimitPerHour}
+            value={form.rateLimitPerHour}
+            onChange={(value) =>
               setForm({
                 ...form,
-                [key]: (e.target as HTMLInputElement).checked
+                rateLimitPerHour: value,
               })
             }
           />
         )}
-        {type === 'github-token' && (
-          <S.GitHubToken>
-            <p>
-              Add one or more personal token(s) for authentication from you and
-              your organization members. Multiple tokens can help speed up the
-              data collection process.{' '}
-            </p>
+        {type === 'githubToken' && (
+          <GitHubToken
+            form={form}
+            value={form.token}
+            onChange={(value) =>
+              setForm({
+                ...form,
+                token: value,
+              })
+            }
+          />
+        )}
+        {type === 'gitlabToken' && (
+          <div>
             <p>
               <a
-                href='https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token'
-                target='_blank'
-                rel='noreferrer'
+                href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html"
+                target="_blank"
+                rel="noreferrer"
               >
                 Learn about how to create a personal access token
               </a>
             </p>
-            <h3>Personal Access Token(s)</h3>
-            {Object.entries(githubTokens).map(([key, value]) => (
-              <div className='token' key={key}>
-                <InputGroup
-                  placeholder='token'
-                  type='password'
-                  value={value}
-                  onChange={(e) => handleChangeGitHubToken(key, e.target.value)}
-                />
-                <Button
-                  minimal
-                  icon='cross'
-                  onClick={() => handleRemoveToken(key)}
-                />
-              </div>
-            ))}
-            <div className='action'>
-              <Button
-                outlined
-                small
-                intent={Intent.PRIMARY}
-                text='Another Token'
-                icon='plus'
-                onClick={handleCreateToken}
-              />
-            </div>
-          </S.GitHubToken>
+            <InputGroup
+              placeholder={placeholder}
+              type="password"
+              value={form[key] ?? ''}
+              onChange={(e) => setForm({ ...form, [`${key}`]: e.target.value })}
+            />
+          </div>
         )}
       </FormGroup>
-    )
-  }
+    );
+  };
 
   return (
     <PageHeader
@@ -258,8 +168,8 @@ export const ConnectionFormPage = () => {
         { name, path: `/connections/${plugin}` },
         {
           name: cid ? cid : 'Create',
-          path: `/connections/${plugin}/${cid ? cid : 'create'}`
-        }
+          path: `/connections/${plugin}/${cid ? cid : 'create'}`,
+        },
       ]}
     >
       {loading ? (
@@ -268,20 +178,15 @@ export const ConnectionFormPage = () => {
         <Card>
           <S.Wrapper>
             {fields.map((field) => getFormItem(field))}
-            <div className='footer'>
-              <Button
-                disabled={error}
-                loading={operating}
-                text='Test Connection'
-                onClick={handleTest}
-              />
+            <div className="footer">
+              <Button disabled={error} loading={operating} text="Test Connection" onClick={handleTest} />
               <ButtonGroup>
-                <Button text='Cancel' onClick={handleCancel} />
+                <Button text="Cancel" onClick={handleCancel} />
                 <Button
                   disabled={error}
                   loading={operating}
                   intent={Intent.PRIMARY}
-                  text='Save Connection'
+                  text="Save Connection"
                   onClick={handleSave}
                 />
               </ButtonGroup>
@@ -290,5 +195,5 @@ export const ConnectionFormPage = () => {
         </Card>
       )}
     </PageHeader>
-  )
-}
+  );
+};

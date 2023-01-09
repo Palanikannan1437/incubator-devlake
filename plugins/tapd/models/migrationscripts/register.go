@@ -25,5 +25,6 @@ import (
 func All() []core.MigrationScript {
 	return []core.MigrationScript{
 		new(addInitTables),
+		new(increaseFieldLength),
 	}
 }

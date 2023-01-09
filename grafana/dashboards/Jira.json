@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 8,
-  "iteration": 1660820809930,
+  "id": 20,
+  "iteration": 1672983005672,
   "links": [
     {
       "asDropdown": false,
@@ -977,7 +977,7 @@
           ]
         },
         "datasource": "mysql",
-        "definition": "select concat(name, '--', id) from boards",
+        "definition": "select concat(name, '--', id) from boards where id like 'jira%'",
         "description": null,
         "error": null,
         "hide": 0,
@@ -986,7 +986,7 @@
         "multi": true,
         "name": "board_id",
         "options": [],
-        "query": "select concat(name, '--', id) from boards",
+        "query": "select concat(name, '--', id) from boards where id like 'jira%'",
         "refresh": 1,
         "regex": "/^(?<text>.*)--(?<value>.*)$/",
         "skipUrlSync": false,
@@ -1027,5 +1027,5 @@
   "timezone": "",
   "title": "Jira",
   "uid": "F5vqBQl7z",
-  "version": 5
+  "version": 2
 }

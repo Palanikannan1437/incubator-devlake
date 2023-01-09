@@ -16,35 +16,35 @@
  *
  */
 
-import React, { useMemo, useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import { Button, InputGroup, Checkbox, Intent } from '@blueprintjs/core'
+import React, { useMemo, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { Button, InputGroup, Checkbox, Intent } from '@blueprintjs/core';
 
-import NoData from '@/images/no-data.svg'
-import { PageHeader, Card, Table, ColumnType, Dialog } from '@/components'
+import NoData from '@/images/no-data.svg';
+import { PageHeader, Card, Table, ColumnType, Dialog } from '@/components';
 
-import { useProject } from './use-project'
-import * as S from './styled'
+import { useProject } from './use-project';
+import * as S from './styled';
 
 type ProjectItem = {
-  name: string
-}
+  name: string;
+};
 
 export const ProjectHomePage = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [enableDora, setEnableDora] = useState(true)
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [enableDora, setEnableDora] = useState(true);
 
-  const history = useHistory()
+  const history = useHistory();
 
-  const handleShowDialog = () => setIsOpen(true)
-  const handleHideDialog = () => setIsOpen(false)
+  const handleShowDialog = () => setIsOpen(true);
+  const handleHideDialog = () => setIsOpen(false);
 
   const { loading, operating, projects, onSave } = useProject<ProjectItem>({
     name,
     enableDora,
-    onHideDialog: handleHideDialog
-  })
+    onHideDialog: handleHideDialog,
+  });
 
   const columns = useMemo(
     () =>
@@ -54,10 +54,10 @@ export const ProjectHomePage = () => {
           dataIndex: 'name',
           key: 'name',
           render: (name: string) => (
-            <Link to={`/projects/${name}`} style={{ color: '#292b3f' }}>
+            <Link to={`/projects/${window.encodeURIComponent(name)}`} style={{ color: '#292b3f' }}>
               {name}
             </Link>
-          )
+          ),
         },
         {
           title: '',
@@ -68,47 +68,35 @@ export const ProjectHomePage = () => {
             <Button
               outlined
               intent={Intent.PRIMARY}
-              icon='cog'
-              onClick={() => history.push(`/projects/${name}`)}
+              icon="cog"
+              onClick={() => history.push(`/projects/${window.encodeURIComponent(name)}`)}
             />
-          )
-        }
+          ),
+        },
       ] as ColumnType<ProjectItem>,
-    []
-  )
+    [],
+  );
 
   return (
     <PageHeader
       breadcrumbs={[{ name: 'Projects', path: '/projects' }]}
       extra={
         projects.length ? (
-          <Button
-            intent={Intent.PRIMARY}
-            icon='plus'
-            text='New Project'
-            onClick={handleShowDialog}
-          />
+          <Button intent={Intent.PRIMARY} icon="plus" text="New Project" onClick={handleShowDialog} />
         ) : null
       }
     >
       <S.Container>
         {!projects.length ? (
-          <Card className='card'>
-            <div className='logo'>
-              <img src={NoData} alt='' />
+          <Card className="card">
+            <div className="logo">
+              <img src={NoData} alt="" />
             </div>
-            <div className='desc'>
-              <p>
-                Add new projects to see engineering metrics based on projects.
-              </p>
+            <div className="desc">
+              <p>Add new projects to see engineering metrics based on projects.</p>
             </div>
-            <div className='action'>
-              <Button
-                intent={Intent.PRIMARY}
-                icon='plus'
-                text='New Project'
-                onClick={handleShowDialog}
-              />
+            <div className="action">
+              <Button intent={Intent.PRIMARY} icon="plus" text="New Project" onClick={handleShowDialog} />
             </div>
           </Card>
         ) : (
@@ -116,40 +104,36 @@ export const ProjectHomePage = () => {
         )}
         <Dialog
           isOpen={isOpen}
-          title='Create a New Project'
+          title="Create a New Project"
           style={{
             top: -100,
-            width: 820
+            width: 820,
           }}
-          okText='Save'
+          okText="Save"
           okDisabled={!name}
           okLoading={operating}
           onCancel={handleHideDialog}
           onOk={onSave}
         >
           <S.DialogWrapper>
-            <div className='block'>
+            <div className="block">
               <h3>Project Name *</h3>
               <p>Give your project a unique name.</p>
-              <InputGroup
-                placeholder='Your Project Name'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <InputGroup placeholder="Your Project Name" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
-            <div className='block'>
+            <div className="block">
               <h3>Project Settings</h3>
-              <div className='checkbox'>
+              <div className="checkbox">
                 <Checkbox
-                  label='Enable DORA Metrics'
+                  label="Enable DORA Metrics"
                   checked={enableDora}
-                  onChange={(e) =>
-                    setEnableDora((e.target as HTMLInputElement).checked)
-                  }
+                  onChange={(e) => setEnableDora((e.target as HTMLInputElement).checked)}
                 />
                 <p>
-                  DORA metrics are four widely-adopted metrics for measuring
-                  software delivery performance.
+                  <a href="https://devlake.apache.org/docs/UserManuals/DORA/" rel="noreferrer" target="_blank">
+                    DORA metrics
+                  </a>{' '}
+                  <span>are four widely-adopted metrics for measuring software delivery performance.</span>
                 </p>
               </div>
             </div>
@@ -157,5 +141,5 @@ export const ProjectHomePage = () => {
         </Dialog>
       </S.Container>
     </PageHeader>
-  )
-}
+  );
+};
