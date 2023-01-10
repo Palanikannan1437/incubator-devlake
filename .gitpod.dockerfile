@@ -19,9 +19,3 @@ RUN echo "nvm use default &>/dev/null" >> ~/.bashrc.d/51-nvm-fix
 
 # installing additional languages
 RUN sudo apt install cmake -y
-
-WORKDIR "/workspace/incubator-devlake"
-
-RUN git clone -b v1.3.0 https://github.com/libgit2/libgit2.git && cd libgit2 \
-    sudo mkdir build && cd build && sudo cmake .. \
-    sudo make && sudo make install
