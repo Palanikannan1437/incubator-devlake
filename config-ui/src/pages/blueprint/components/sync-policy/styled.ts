@@ -16,18 +16,54 @@
  *
  */
 
-const tapd = [
-  [
-    {
-      plugin: 'tapd',
-      options: {
-        createdDateAfter: '2006-01-02T15:04:05Z',
-        companyId: 1,
-        workspaceId: 1,
-        connectionId: 1,
-      },
-    },
-  ],
-];
+import styled from 'styled-components';
 
-export default tapd;
+export const Wrapper = styled.div`
+  .block + .block {
+    margin-top: 24px;
+  }
+`;
+
+export const Input = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const Help = styled.div`
+  padding: 10px;
+  width: 300px;
+  font-size: 12px;
+
+  .title {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700px;
+
+    span.bp4-icon {
+      margin-right: 4px;
+    }
+  }
+
+  img {
+    width: 100%;
+  }
+`;
+
+export const FromTimeWrapper = styled.div`
+  .quick-selection {
+    margin-bottom: 16px;
+
+    & > .bp4-tag {
+      cursor: pointer;
+    }
+  }
+
+  .time-selection {
+    display: flex;
+    align-items: center;
+
+    & > strong {
+      margin-left: 4px;
+    }
+  }
+`;

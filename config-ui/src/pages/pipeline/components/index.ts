@@ -17,3 +17,4 @@
  */
 
 export * from './historical';
+export * from './duration';

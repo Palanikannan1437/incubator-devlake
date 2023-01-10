@@ -23,8 +23,9 @@ import classNames from 'classnames';
 
 import { Card, Loading } from '@/components';
 import { useAutoRefresh } from '@/hooks';
-import { formatTime, duration } from '@/utils';
+import { formatTime } from '@/utils';
 
+import { PipelineDuration } from '../components';
 import type { PipelineType, TaskType } from '../types';
 import { StatusEnum } from '../types';
 import { STATUS_ICON, STATUS_LABEL, STATUS_CLS } from '../misc';
@@ -60,7 +61,8 @@ export const PipelineDetail = ({ id }: Props) => {
       cancel: (data) => {
         const { pipeline } = data ?? {};
         return !!(
-          pipeline && [StatusEnum.COMPLETED, StatusEnum.FAILED, StatusEnum.CANCELLED].includes(pipeline.status)
+          pipeline &&
+          [StatusEnum.COMPLETED, StatusEnum.PARTIAL, StatusEnum.FAILED, StatusEnum.CANCELLED].includes(pipeline.status)
         );
       },
     },
@@ -102,7 +104,9 @@ export const PipelineDetail = ({ id }: Props) => {
           </li>
           <li>
             <span>Duration</span>
-            <strong>{duration(beganAt, finishedAt)}</strong>
+            <strong>
+              <PipelineDuration status={status} beganAt={beganAt} finishedAt={finishedAt} />
+            </strong>
           </li>
           <li>
             <span>Current Stage</span>
@@ -142,7 +146,7 @@ export const PipelineDetail = ({ id }: Props) => {
                 case !!stages[key].find((task) => [StatusEnum.ACTIVE, StatusEnum.RUNNING].includes(task.status)):
                   status = 'loading';
                   break;
-                case stages[key].every((task) => task.status === StatusEnum.COMPLETED):
+                case stages[key].every((task) => [StatusEnum.COMPLETED, StatusEnum.PARTIAL].includes(task.status)):
                   status = 'success';
                   break;
                 case !!stages[key].find((task) => task.status === StatusEnum.FAILED):

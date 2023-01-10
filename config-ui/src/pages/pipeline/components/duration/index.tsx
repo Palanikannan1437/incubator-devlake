@@ -16,34 +16,25 @@
  *
  */
 
-import styled from 'styled-components';
+import React from 'react';
+import dayjs from 'dayjs';
 
-export const Wrapper = styled.div`
-  .block + .block {
-    margin-top: 24px;
-  }
-`;
-export const Input = styled.div`
-  display: flex;
-  align-items: center;
-`;
+import { StatusEnum } from '../../types';
 
-export const Help = styled.div`
-  padding: 10px;
-  width: 300px;
-  font-size: 12px;
+interface Props {
+  status: StatusEnum;
+  beganAt: string;
+  finishedAt: string | null;
+}
 
-  .title {
-    margin-bottom: 10px;
-    font-size: 14px;
-    font-weight: 700px;
-
-    span.bp4-icon {
-      margin-right: 4px;
-    }
+export const PipelineDuration = ({ status, beganAt, finishedAt }: Props) => {
+  if (![StatusEnum.CANCELLED, StatusEnum.COMPLETED, StatusEnum.FAILED].includes(status)) {
+    return <span>{dayjs(beganAt).toNow(true)}</span>;
   }
 
-  img {
-    width: 100%;
+  if (!finishedAt) {
+    return <span>-</span>;
   }
-`;
+
+  return <span>{dayjs(beganAt).from(finishedAt, true)}</span>;
+};

@@ -54,7 +54,7 @@ build: build-plugin build-server
 all: build build-worker
 
 build-server-image:
-	docker build -t $(IMAGE_REPO)/devlake:$(TAG) --file ./Dockerfile .
+	docker build -t $(IMAGE_REPO)/devlake:$(TAG) --build-arg TAG=$(TAG) --build-arg SHA=$(SHA) --file ./Dockerfile .
 
 build-config-ui-image:
 	cd config-ui; docker build -t $(IMAGE_REPO)/devlake-config-ui:$(TAG) --file ./Dockerfile .
@@ -111,13 +111,10 @@ unit-test: mock build
 	set -e; for m in $$(go list ./... | egrep -v 'test|models|e2e'); do echo $$m; go test -timeout 60s -v $$m; done
 
 e2e-test: build
-	PLUGIN_DIR=$(shell readlink -f bin/plugins) go test -timeout 300s -v ./test/...
+	PLUGIN_DIR=$(shell readlink -f bin/plugins) go test -timeout 300s -p 1 -v ./test/...
 
 e2e-plugins:
 	export ENV_PATH=$(shell readlink -f .env); set -e; for m in $$(go list ./plugins/... | egrep 'e2e'); do echo $$m; go test -timeout 300s -gcflags=all=-l -v $$m; done
-
-real-e2e-test:
-	PLUGIN_DIR=$(shell readlink -f bin/plugins) go test -v ./e2e/...
 
 lint:
 	golangci-lint run

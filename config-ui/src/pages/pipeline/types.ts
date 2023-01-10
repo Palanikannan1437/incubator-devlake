@@ -25,6 +25,7 @@ export enum StatusEnum {
   RUNNING = 'TASK_RUNNING',
   RERUN = 'TASK_RERUN',
   COMPLETED = 'TASK_COMPLETED',
+  PARTIAL = 'TASK_PARTIAL',
   FAILED = 'TASK_FAILED',
   CANCELLED = 'TASK_CANCELLED',
 }
@@ -46,8 +47,8 @@ export type TaskType = {
   status: StatusEnum;
   pipelineRow: number;
   pipelineCol: number;
-  beganAt?: string;
-  finishedAt?: string;
+  beganAt: string;
+  finishedAt: string | null;
   options: string;
   message: string;
   progressDetail?: {
