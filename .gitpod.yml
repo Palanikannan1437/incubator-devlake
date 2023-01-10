@@ -23,10 +23,11 @@ tasks:
       LD_LIBRARY_PATH: ":/usr/local/lib"
     init: go get
     command: |
-      gp sync-await init_libgit && gp sync-await init_docker_containers && cp .env.example .env
-      sed -i'' '/^DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4\&parseTime=True"#' .env
-      sed -i'' '/^E2E_DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake_test?charset=utf8mb4\&parseTime=True"#' .env
-      docker-compose up -d mysql grafana
+      gp sync-await init_libgit && gp sync-await init_docker_containers &&
+      cp .env.example .env &&
+      sed -i'' '/^DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4\&parseTime=True"#' .env &&
+      sed -i'' '/^E2E_DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake_test?charset=utf8mb4\&parseTime=True"#' .env &&
+      docker-compose up -d mysql grafana &&
       make dev
 
   - name: start frontend
