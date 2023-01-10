@@ -1,14 +1,4 @@
 tasks:
-  - name: Initialize libgit 2
-    init: |
-      git clone -b v1.3.0 https://github.com/libgit2/libgit2.git && cd libgit2
-      mkdir build && cd build && sudo cmake ..
-      sudo make && sudo make install
-      cd ../../
-    command: |
-      gp sync-done init_libgit
-      echo "Initialized libgit2 v1.3.0 🚀"
-
   - name: Install mysql and grafana
     init: |
       docker pull mysql:8
@@ -24,7 +14,7 @@ tasks:
       LD_LIBRARY_PATH: ":/usr/local/lib"
     init: go get
     command: |
-      gp sync-await init_libgit && gp sync-await init_docker_containers &&
+      gp sync-await init_docker_containers &&
       cp .env.example .env &&
       sed -i'' '/^DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4\&parseTime=True"#' .env &&
       sed -i'' '/^E2E_DB_URL=/s#=.*#="mysql://merico:merico@127.0.0.1:3306/lake_test?charset=utf8mb4\&parseTime=True"#' .env &&
