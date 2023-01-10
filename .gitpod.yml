@@ -11,8 +11,9 @@ tasks:
 
   - name: Install mysql and grafana
     init: |
-      docker pull mysql 
-      docker pull grafana/grafana
+      docker pull mysql:8
+      docker pull mericodev/devlake-dashboard:latest
+      mericodev/devlake:latest
     command: |
       gp sync-done init_docker_containers
       echo "MySQL and Grafana downloaded🚀"
