@@ -66,6 +66,7 @@ func getEnvPath() string {
 
 // Set default value for no .env or .env not set it
 func setDefaultValue(v *viper.Viper) {
+	fmt.Println(v.Get("DB_URL"))
 	v.SetDefault("DB_URL", "mysql://merico:merico@mysql:3306/lake?charset=utf8mb4&parseTime=True")
 	v.SetDefault("PORT", ":8080")
 	v.SetDefault("PLUGIN_DIR", "bin/plugins")
