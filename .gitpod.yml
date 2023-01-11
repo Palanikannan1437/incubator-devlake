@@ -6,9 +6,9 @@ tasks:
 
   - name: Install mysql and grafana
     init: |
-      docker pull mysql:8
-      docker pull mericodev/devlake-dashboard:latest
-      docker pull mericodev/devlake:latest
+      docker pull mysql:8 &
+      docker pull mericodev/devlake-dashboard:latest &
+      docker pull mericodev/devlake:latest &
     command: |
       gp sync-done init_docker_containers
       echo "MySQL and Grafana downloaded 🚀"
@@ -19,7 +19,7 @@ tasks:
       PKG_CONFIG_PATH: ":/usr/local/lib:/usr/local/lib/pkgconfig"
       LD_LIBRARY_PATH: ":/usr/local/lib"
     init: |
-      go get
+      go get &&
       make build-plugin
     command: |
       cp .env.example .env &&
