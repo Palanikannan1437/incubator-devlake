@@ -3,6 +3,7 @@ tasks:
     command: |
       gp sync-done init_libgit
       echo "Initialized libgit2 v1.3.0 🚀"
+      exit
 
   - name: Install mysql and grafana
     init: |
@@ -12,6 +13,7 @@ tasks:
     command: |
       gp sync-done init_docker_containers
       echo "MySQL and Grafana downloaded 🚀"
+      exit
 
   - name: start backend
     env:
@@ -36,13 +38,17 @@ tasks:
       cd config-ui
       nvm use 14.21.0 && npm start
 
+  - name: open-frontend-preview
+    command: |
+      gp sync-await 8080 && gp preview $(gp url 4000)
+
 ports:
   - port: 8080
     onOpen: ignore
     name: devlake-api
     visibility: public
   - port: 4000
-    onOpen: open-preview
+    onOpen: ignore
     name: devlake-ui
     visibility: public
   - port: 3306
