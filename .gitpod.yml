@@ -20,7 +20,7 @@ tasks:
       docker pull mericodev/devlake:latest
     command: |
       gp sync-done init_docker_containers
-      echo "MySQL and Grafana downloaded🚀"
+      echo "MySQL and Grafana downloaded 🚀"
 
   - name: start backend
     env:
