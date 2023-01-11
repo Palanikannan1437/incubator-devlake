@@ -18,14 +18,16 @@ tasks:
     env:
       PKG_CONFIG_PATH: ":/usr/local/lib:/usr/local/lib/pkgconfig"
       LD_LIBRARY_PATH: ":/usr/local/lib"
-    init: go get
+    init: |
+      go get
+      make build-plugin
     command: |
       cp .env.example .env &&
       sed -i'' '/^DB_URL=/s#=.*#=mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4\&parseTime=True#' .env &&
       sed -i'' '/^E2E_DB_URL=/s#=.*#=mysql://merico:merico@127.0.0.1:3306/lake_test?charset=utf8mb4\&parseTime=True#' .env &&
       gp sync-await init_docker_containers &&
       docker-compose up -d mysql grafana &&
-      make dev
+      make run
 
   - name: start frontend
     init: |
