@@ -1,8 +1,7 @@
 tasks:
-  - name: Initialize libgit 2
+  - name: open-frontend-preview
     command: |
-      gp sync-done init_libgit
-      echo "Initialized libgit2 v1.3.0 🚀"
+      gp sync-await 8080 && gp preview $(gp url 4000) 
       exit
 
   - name: Install mysql and grafana
@@ -24,7 +23,6 @@ tasks:
       cp .env.example .env &&
       sed -i'' '/^DB_URL=/s#=.*#=mysql://merico:merico@127.0.0.1:3306/lake?charset=utf8mb4\&parseTime=True#' .env &&
       sed -i'' '/^E2E_DB_URL=/s#=.*#=mysql://merico:merico@127.0.0.1:3306/lake_test?charset=utf8mb4\&parseTime=True#' .env &&
-      gp sync-await init_libgit && 
       gp sync-await init_docker_containers &&
       docker-compose up -d mysql grafana &&
       make dev
@@ -37,10 +35,6 @@ tasks:
     command: |
       cd config-ui
       nvm use 14.21.0 && npm start
-
-  - name: open-frontend-preview
-    command: |
-      gp sync-await 8080 && gp preview $(gp url 4000)
 
 ports:
   - port: 8080
