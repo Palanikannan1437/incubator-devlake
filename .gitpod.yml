@@ -1,14 +1,5 @@
 tasks:
   - name: Initialize libgit 2
-    init: |
-      git clone --depth=1 -b v1.3.0 https://github.com/libgit2/libgit2.git && 
-      rm -rf ./libgit2/.git
-      cd libgit2 &&
-      mkdir build && 
-      cd build && 
-      sudo cmake .. &&
-      sudo make && sudo make install &&
-      cd ../../
     command: |
       gp sync-done init_libgit
       echo "Initialized libgit2 v1.3.0 🚀"
