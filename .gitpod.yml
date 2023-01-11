@@ -1,7 +1,7 @@
 tasks:
   - name: open-frontend-preview
     command: |
-      gp sync-await 8080 && gp preview $(gp url 4000) 
+      gp ports 8080 && gp preview $(gp url 4000) 
       exit
 
   - name: Install mysql and grafana
